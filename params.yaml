@@ -1,0 +1,20 @@
+base:
+  workplace_pvc: resc01-pvc
+  working_dir: varroa_classifier_distributed
+  random_seed: 41
+
+model:
+  pooling: None
+
+volcano:
+  worker_name: varroa-classifier
+  num_workers: 2
+  num_gpus_per_worker: 5
+
+train:
+  batch_size_per_replica: 128
+  epochs: 50
+  learning_rate: 0.01
+  training_split: 80
+  validation_freq: 1
+  verbosity: 1

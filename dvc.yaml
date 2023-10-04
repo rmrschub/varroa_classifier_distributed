@@ -1,0 +1,43 @@
+stages:
+  job:
+    cmd: WORKPLACE_PVC=${base.workplace_pvc}
+         WORKER_NAME=${volcano.worker_name}
+         WORKING_DIR=${base.working_dir}
+         NUM_WORKERS=${volcano.num_workers} 
+         NUM_GPUS_PER_WORKER=${volcano.num_gpus_per_worker}
+         bin/mo < src/volcano.tpl > src/volcano.yaml
+    deps:
+      - src/volcano.tpl
+    params:
+      - base
+      - volcano
+    outs:
+      - src/volcano.yaml
+
+  train:
+    cmd: kubectl apply -f src/volcano.yaml
+    deps:
+      - src/train.py
+      - src/volcano.yaml
+    params:
+      - base
+      - model
+      - train
+
+plots:
+  - dvclive/plots/metrics/train/accuracy.tsv:
+      template: simple
+      x: step
+      y: accuracy
+  - dvclive/plots/metrics/train/loss.tsv:
+      template: simple
+      x: step
+      y: loss
+  - dvclive/plots/metrics/eval/accuracy.tsv:
+      template: simple
+      x: step
+      y: accuracy
+  - dvclive/plots/metrics/eval/loss.tsv:
+      template: simple
+      x: step
+      y: loss
