@@ -3,18 +3,30 @@ base:
   working_dir: varroa_classifier_distributed
   random_seed: 41
 
+dataset:
+  training:
+    ratio: 0.80
+    path: './datasets/training'
+  validation:
+    ratio: 0.10
+    path: './datasets/validation'
+  testing:
+    path: './datasets/testing'
+
 model:
+  input_shape: [300, 150, 3]
   pooling: None
 
 volcano:
   worker_name: varroa-classifier
-  num_workers: 2
+  min_num_workers: 1
+  max_num_workers: 2
   num_gpus_per_worker: 5
+  queue: default
 
 train:
   batch_size_per_replica: 128
-  epochs: 50
-  learning_rate: 0.01
-  training_split: 80
+  epochs: 2
+  learning_rate: 0.001
   validation_freq: 1
   verbosity: 1
