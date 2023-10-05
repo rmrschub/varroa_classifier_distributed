@@ -3,9 +3,9 @@ kind: Job
 metadata:
   name: {{WORKER_NAME}}
 spec:
-  minAvailable: {{NUM_WORKERS}}
+  minAvailable: {{MIN_NUM_WORKERS}}
   schedulerName: volcano
-  queue: default
+  queue: {{QUEUE}}
   plugins:
     env: []
     svc: []
@@ -13,7 +13,7 @@ spec:
     - event: PodEvicted
       action: RestartJob
   tasks:
-    - replicas: {{NUM_WORKERS}}
+    - replicas: {{MAX_NUM_WORKERS}}
       name: worker
       policies:
         - event: TaskCompleted
