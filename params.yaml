@@ -18,15 +18,16 @@ model:
   pooling: None
 
 volcano:
-  worker_name: varroa-classifier
+  job_id: 1
+  job_name: varroa-classifier
   min_num_workers: 1
   max_num_workers: 2
-  num_gpus_per_worker: 5
+  num_gpus_per_worker: 1
   queue: default
 
 train:
   batch_size_per_replica: 128
-  epochs: 2
+  epochs: 50
   learning_rate: 0.001
   validation_freq: 1
   verbosity: 1

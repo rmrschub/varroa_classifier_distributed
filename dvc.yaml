@@ -1,10 +1,28 @@
 stages:
-  job:
-    cmd: WORKPLACE_PVC=${base.workplace_pvc}
-         WORKER_NAME=${volcano.worker_name}
-         WORKING_DIR=${base.working_dir}
-         NUM_WORKERS=${volcano.num_workers} 
+
+  split_data:
+    cmd: python3 src/split_data.py
+    deps:
+      - src/split_data.py
+    params:
+      - base
+      - dataset
+    outs:
+      - datasets/training:
+          cache: true
+      - datasets/validation:
+          cache: true
+      - datasets/testing:
+          cache: true
+
+  prepare_volcano_job:
+    cmd: WORKER_NAME=${volcano.job_name}-${volcano.job_id}
+         QUEUE=${volcano.queue} 
+         MIN_NUM_WORKERS=${volcano.min_num_workers} 
+         MAX_NUM_WORKERS=${volcano.max_num_workers} 
          NUM_GPUS_PER_WORKER=${volcano.num_gpus_per_worker}
+         WORKPLACE_PVC=${base.workplace_pvc}
+         WORKING_DIR=${base.working_dir}
          bin/mo < src/volcano.tpl > src/volcano.yaml
     deps:
       - src/volcano.tpl
@@ -14,9 +32,13 @@ stages:
     outs:
       - src/volcano.yaml
 
-  train:
-    cmd: kubectl apply -f src/volcano.yaml
+  schedule_training:
+    cmd: 
+      - kubectl apply -f src/volcano.yaml
+#      - kubectl wait --timeout -1s --for=jsonpath='{.status.state.phase}'=Completed vj/${volcano.worker_name}
     deps:
+      - datasets/training
+      - datasets/validation
       - src/train.py
       - src/volcano.yaml
     params:
